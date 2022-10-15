@@ -78,7 +78,38 @@ def test_classify_language(test_client, audio_file):
         f"/classify_lang",
         files=files,
     )
-    print(f"{resp=}")
-    print(f"{resp.json()}")
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["lang_code"] == "en"
+
+
+def test_vtt_file(test_client, audio_file):
+    expected = """WEBVTT
+
+00:00.000 --> 00:06.500
+ Not having the courage or the industry of our neighbor, who works like a busy bee in the world of men and books,
+
+00:06.500 --> 00:10.300
+ searching with the sweat of his brow for the real bread of life,
+
+00:10.300 --> 00:13.300
+ waiting the open page of for him with his tears,
+
+00:13.300 --> 00:16.800
+ pushing into the wee hours of the night his quest,
+
+00:16.800 --> 00:21.000
+ animated by the fairest of all loves, the love of truth.
+
+00:21.000 --> 00:31.000
+ We ease our own indolent conscience by calling him names.
+
+ """
+    f = open(audio_file, "rb")
+    files = {"file": (f.name, f, "multipart/form-data")}
+
+    resp = test_client.post(
+        f"/vtt-file/transcribe",
+        files=files,
+    )
+    assert resp.status_code == status.HTTP_200_OK
+    # TODO: meaningful assert here?

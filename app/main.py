@@ -1,23 +1,22 @@
 import os
 from dataclasses import dataclass
 from enum import Enum
-from io import StringIO, BytesIO
+from io import StringIO
 from typing import Optional, Union
 
 import starlette
 import uvicorn
 from beartype import beartype
-from starlette.responses import FileResponse, StreamingResponse
-
-import whisper
 from beartype.door import is_bearable
 from fastapi import FastAPI, UploadFile, Query
+from starlette.responses import StreamingResponse
 
+import whisper
 from app.models import WhisperResponse
+from app.utils import load_audio_from_bytes
 from whisper import Whisper
 from whisper.tokenizer import LANGUAGES
-
-from app.utils import load_audio_from_bytes, write_webvtt_file
+from whisper.utils import write_vtt
 
 app = FastAPI()
 inferencer: Optional[Whisper] = None
@@ -52,12 +51,7 @@ async def vtt_file(
     # inspired by: https://cloudbytes.dev/snippets/received-return-a-file-from-in-memory-buffer-using-fastapi
 
     vtt_file = StringIO()
-    write_webvtt_file(
-        start_end_text=[
-            (seg["start"], seg["end"], seg["text"]) for seg in result["segments"]
-        ],
-        file=vtt_file,
-    )
+    write_vtt(result["segments"], file = vtt_file)
     vtt_file.seek(0)
     return StreamingResponse(
         vtt_file,
