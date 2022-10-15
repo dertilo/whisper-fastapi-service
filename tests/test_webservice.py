@@ -60,14 +60,21 @@ def test_load_model(test_client, input_error_code):
     assert resp.status_code == error_code
 
 
-def test_transcripe_endpoint(test_client, audio_file, transcript_reference):
-    max_CER = 0.03
+@pytest.mark.parametrize(
+    "task_cer",
+    [
+        ("transcribe", 0.03),
+        ("translate", 0.03),  # does not make that much sense cause its english->english
+    ],
+)
+def test_tasks(test_client, audio_file, transcript_reference, task_cer):
+    task, max_CER = task_cer
 
     f = open(audio_file, "rb")
     files = {"file": (f.name, f, "multipart/form-data")}
 
     resp = test_client.post(
-        "/transcribe",
+        f"/{task}",
         files=files,
     )
 

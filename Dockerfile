@@ -19,6 +19,7 @@ RUN python3 -m venv /venv && $PIP_INSTALL pip packaging setuptools
 COPY requirements.txt ./
 COPY requirements_test.txt ./
 RUN $PIP_INSTALL -r requirements.txt
+RUN cp -r /venv /venv_no_test
 
 COPY app ./app
 COPY tests ./tests
@@ -44,7 +45,7 @@ WORKDIR /code
 EXPOSE 2700/tcp
 
 LABEL maintainer="Tilo Himmelsbach"
-COPY --from=build /venv /venv
+COPY --from=build /venv_no_test /venv
 COPY --from=build /code/app /code/app
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "2700"]

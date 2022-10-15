@@ -1,7 +1,16 @@
-# whisper-fastapi-service [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-OpenAI's Whisper dockerized and put behind FastAPI
+# Whisper FastAPI Service [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![bear-ified](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.readthedocs.io)
+OpenAI's [Whisper](https://github.com/openai/whisper/) dockerized and put behind [FastAPI](https://fastapi.tiangolo.com/)
+## TL;DR (Too Lazy Doit Rapido!)
+1. run docker-container
+```commandline
+docker run --rm -p 2700:2700 dertilo/whisper-fastapi-service:latest
+```
+2. transcribe files of "almost any format": `wav,flac,mp3,opus,mp4,...`
+   * either goto: `localhost:2700/docs`
+   * OR curl it: `curl -F 'file=@<some-where>/<your_file>' http://localhost:2700/transcribe`
 
-### run locally
+
+## run service locally
 ```commandline
 # run service
 pip install -r requirements.txt
@@ -31,7 +40,7 @@ curl -F 'file=@tests/resources/LibriSpeech_dev-other_116_288046_116-288046-0011.
 }
 ```
 
-### build & run docker-image/container
+## build & run docker-image/container
 ```commandline
 docker build -t whisper-fastapi-service .
 
