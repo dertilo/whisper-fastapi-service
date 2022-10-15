@@ -36,7 +36,7 @@ class WhisperSegment:
     start: int
     end: int
     text: str
-    tokens: list[str]
+    tokens: list[int]  # see: whisper's DecodingResult
     temperature: float
     avg_logprob: float
     compression_ratio: float

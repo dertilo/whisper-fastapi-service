@@ -1,4 +1,5 @@
 import re
+from pprint import pprint
 
 import Levenshtein
 import pytest
@@ -40,10 +41,16 @@ def test_transcripe_endpoint(test_client, audio_file, transcript_reference):
     )
 
     assert resp.status_code == status.HTTP_200_OK
-    hyp = resp.json()["text"]
+    resp_dict = resp.json()
+    hyp = resp_dict["text"]
     ref = transcript_reference.upper()
 
-    hyp_upper_no_punct = re.sub(r"[^A-Z|\s]", "", hyp.upper())
-    hyp_upper_no_punct = re.sub(r"\s+", " ", hyp_upper_no_punct)
+    hyp_upper_no_punct = _poormans_text_normalization(hyp)
     cer = Levenshtein.distance(hyp_upper_no_punct, ref) / len(ref)
     assert cer <= max_CER
+
+
+def _poormans_text_normalization(hyp):
+    hyp_upper_no_punct = re.sub(r"[^A-Z|\s]", "", hyp.upper())
+    hyp_upper_no_punct = re.sub(r"\s+", " ", hyp_upper_no_punct)
+    return hyp_upper_no_punct
