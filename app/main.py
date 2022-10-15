@@ -114,7 +114,7 @@ async def predict(
     return {"loaded_model": whisper._MODELS[model_name]}
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     """
     just for debugging
     """
