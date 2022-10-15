@@ -28,6 +28,15 @@ RUN python -m pytest .
 
 # ----------- PRODUCTION STAGE ----------------------------------
 FROM python:3.9-slim-bullseye AS prod
+
+RUN export DEBIAN_FRONTEND=noninteractive \
+  && apt-get -qq update \
+  && apt-get -qq upgrade \
+  && apt-get -qq install --no-install-recommends \
+  ffmpeg \
+  libsndfile1 \
+  && rm -rf /var/lib/apt/lists/*
+
 ENV PATH="/venv/bin:$PATH"
 
 WORKDIR /code
