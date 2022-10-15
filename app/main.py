@@ -1,14 +1,15 @@
 import os
 from dataclasses import dataclass
 from enum import Enum
-from tempfile import NamedTemporaryFile
 from typing import Optional
 
 import uvicorn
 import whisper
 from fastapi import FastAPI, UploadFile
-from whisper import Whisper, load_audio
+from whisper import Whisper
 from whisper.tokenizer import LANGUAGES
+
+from app.utils import load_audio_from_bytes
 
 app = FastAPI()
 inferencer: Optional[Whisper] = None
@@ -58,17 +59,11 @@ async def predict(
     global inferencer
     assert isinstance(inferencer, Whisper)  # Type narrowing to keep mypy happy
 
-    def save_file(filename, data):
-        with open(filename, "wb") as f:
-            f.write(data)
-
-    with NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
-        # data_bytes = file.file.read() # if in synchronous context otherwise just file
-        data_bytes = await file.read()  # if in Asynchronous context
-        save_file(tmp_file.name, data_bytes)
-        audio = load_audio(tmp_file.name)
-        # voluntarily blocking the async event loop cause heavy-lifting (cpu-bound) stuff in ThreadPool makes no sense
-        result = inferencer.transcribe(audio, task=task_name)
+    # data_bytes = file.file.read() # if in synchronous context otherwise just file
+    data_bytes = await file.read()  # if in Asynchronous context
+    audio = load_audio_from_bytes(data_bytes)
+    # voluntarily blocking the async event loop cause heavy-lifting (cpu-bound) stuff in ThreadPool makes no sense
+    result = inferencer.transcribe(audio, task=task_name)
 
     return result
 

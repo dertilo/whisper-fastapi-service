@@ -30,3 +30,10 @@ curl -F 'file=@tests/resources/LibriSpeech_dev-other_116_288046_116-288046-0011.
               }
 }
 ```
+
+### build & run docker-image/container
+```commandline
+docker build -t whisper-fastapi-service .
+
+docker run --rm -p 2700:2700 whisper-fastapi-service
+```
