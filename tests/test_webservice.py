@@ -60,6 +60,12 @@ def test_load_model(test_client, input_error_code):
     assert resp.status_code == error_code
 
 
+def _poormans_text_normalization(hyp):
+    hyp_upper_no_punct = re.sub(r"[^A-Z|\s]", "", hyp.upper())
+    hyp_upper_no_punct = re.sub(r"\s+", " ", hyp_upper_no_punct)
+    return hyp_upper_no_punct
+
+
 @pytest.mark.parametrize(
     "task_cer",
     [
@@ -88,7 +94,15 @@ def test_tasks(test_client, audio_file, transcript_reference, task_cer):
     assert cer <= max_CER
 
 
-def _poormans_text_normalization(hyp):
-    hyp_upper_no_punct = re.sub(r"[^A-Z|\s]", "", hyp.upper())
-    hyp_upper_no_punct = re.sub(r"\s+", " ", hyp_upper_no_punct)
-    return hyp_upper_no_punct
+def test_classify_language(test_client, audio_file):
+    f = open(audio_file, "rb")
+    files = {"file": (f.name, f, "multipart/form-data")}
+
+    resp = test_client.post(
+        f"/classify_lang",
+        files=files,
+    )
+    print(f"{resp=}")
+    print(f"{resp.json()}")
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()["lang_code"] == "en"

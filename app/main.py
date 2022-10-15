@@ -7,7 +7,6 @@ import uvicorn
 import whisper
 from beartype.door import is_bearable
 from fastapi import FastAPI, UploadFile, Query
-from pydantic import BaseModel, create_model
 from whisper import Whisper
 from whisper.tokenizer import LANGUAGES
 
@@ -25,6 +24,29 @@ LANGUAGE_CODES = sorted(list(LANGUAGES.keys()))
 def startup_event():
     global inferencer
     inferencer = whisper.load_model(MODEL_NAME)
+
+
+@dataclass
+class ClassifyLangResponse:
+    lang_name: str  # lang instead of language cause this word is "too difficult"! -> langauge
+    lang_code: str
+
+
+# this must come before the "task" endpoint, cause they are in same "root"-path -> "/"
+@app.post("/classify_lang", response_model=ClassifyLangResponse)
+async def classify_lang(
+    file: UploadFile,
+):
+    global inferencer
+    data_bytes = await file.read()  # in synchronous context do:  file.file.read()
+    audio = load_audio_from_bytes(data_bytes)
+    audio = whisper.pad_or_trim(audio)
+    mel = whisper.log_mel_spectrogram(audio).to(inferencer.device)
+
+    _, probs = inferencer.detect_language(mel)  # yes its blocking! who cares?
+    lang_code = max(probs, key=probs.get)
+    # TODO: maybe return dict lang_code : prob?
+    return {"lang_name": LANGUAGES[lang_code], "lang_code": lang_code}
 
 
 class TaskName(str, Enum):
