@@ -47,6 +47,19 @@ def test_language(test_client, audio_file, lang_error_code):
     assert resp.status_code == error_code
 
 
+@pytest.mark.parametrize(
+    "input_error_code",
+    [
+        ("base", status.HTTP_200_OK),
+        ("not-valid-model_name", status.HTTP_422_UNPROCESSABLE_ENTITY),
+    ],
+)
+def test_load_model(test_client, input_error_code):
+    model_name, error_code = input_error_code
+    resp = test_client.get(f"/load_model/{model_name}")
+    assert resp.status_code == error_code
+
+
 def test_transcripe_endpoint(test_client, audio_file, transcript_reference):
     max_CER = 0.03
 

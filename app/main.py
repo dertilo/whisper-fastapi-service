@@ -7,6 +7,7 @@ import uvicorn
 import whisper
 from beartype.door import is_bearable
 from fastapi import FastAPI, UploadFile, Query
+from pydantic import BaseModel, create_model
 from whisper import Whisper
 from whisper.tokenizer import LANGUAGES
 
@@ -16,6 +17,7 @@ app = FastAPI()
 inferencer: Optional[Whisper] = None
 
 MODEL_NAME = os.environ.get("MODEL_NAME", "base")
+assert MODEL_NAME in whisper._MODELS.keys()
 LANGUAGE_CODES = sorted(list(LANGUAGES.keys()))
 
 
@@ -71,6 +73,23 @@ async def predict(
     result = inferencer.transcribe(audio, task=task_name, language=language)
 
     return result
+
+
+class TempEnum(str, Enum):
+    pass
+
+
+# dynamic enum creation see: https://github.com/tiangolo/fastapi/issues/13
+WhisperModelName = TempEnum("TypeEnum", {k: k for k in whisper._MODELS.keys()})
+
+
+@app.get("/load_model/{model_name}")
+async def predict(
+    model_name: WhisperModelName,
+):
+    global inferencer
+    inferencer = whisper.load_model(MODEL_NAME)
+    return {"loaded_model": whisper._MODELS[model_name]}
 
 
 if __name__ == "__main__":
