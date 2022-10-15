@@ -1,11 +1,12 @@
 import os
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union
 
 import uvicorn
 import whisper
-from fastapi import FastAPI, UploadFile
+from beartype.door import is_bearable
+from fastapi import FastAPI, UploadFile, Query
 from whisper import Whisper
 from whisper.tokenizer import LANGUAGES
 
@@ -55,15 +56,19 @@ class WhisperResponse:
 async def predict(
     task_name: TaskName,
     file: UploadFile,
+    language: Union[str, None] = Query(
+        default=None, regex=f"^(?:{'|'.join(LANGUAGE_CODES)})$"
+    ),
 ):
     global inferencer
-    assert isinstance(inferencer, Whisper)  # Type narrowing to keep mypy happy
 
-    # data_bytes = file.file.read() # if in synchronous context otherwise just file
-    data_bytes = await file.read()  # if in Asynchronous context
+    # Type narrowing via assert to keep mypy happy and just for fun using beartype here, cause I like the bear!
+    assert is_bearable(inferencer, Whisper)
+
+    data_bytes = await file.read()  # in synchronous context do:  file.file.read()
     audio = load_audio_from_bytes(data_bytes)
     # voluntarily blocking the async event loop cause heavy-lifting (cpu-bound) stuff in ThreadPool makes no sense
-    result = inferencer.transcribe(audio, task=task_name)
+    result = inferencer.transcribe(audio, task=task_name, language=language)
 
     return result
 

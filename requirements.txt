@@ -1,4 +1,5 @@
 misc_utils@git+https://github.com/dertilo/misc-utils@main#egg=misc_utils
+beartype==0.11.0
 whisper@git+https://github.com/openai/whisper.git@d18e9ea5dd2ca57c697e8e55f9e654f06ede25d0#egg=whisper
 
 # fastapi deps

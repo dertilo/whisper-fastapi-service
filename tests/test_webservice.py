@@ -29,6 +29,24 @@ def transcript_reference() -> str:
     return ref
 
 
+@pytest.mark.parametrize(
+    "lang_error_code",
+    [
+        ("en", status.HTTP_200_OK),
+        ("not-valid-lang", status.HTTP_422_UNPROCESSABLE_ENTITY),
+    ],
+)
+def test_language(test_client, audio_file, lang_error_code):
+    lang, error_code = lang_error_code
+
+    f = open(audio_file, "rb")
+    files = {"file": (f.name, f, "multipart/form-data")}
+
+    resp = test_client.post("/transcribe", files=files, params={"language": lang})
+
+    assert resp.status_code == error_code
+
+
 def test_transcripe_endpoint(test_client, audio_file, transcript_reference):
     max_CER = 0.03
 
