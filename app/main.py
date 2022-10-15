@@ -77,4 +77,9 @@ if __name__ == "__main__":
     """
     just for debugging
     """
-    uvicorn.run(app, host="0.0.0.0", port=2700, log_level="debug", reload=True)
+    import sys
+
+    sys.path.append(".")
+    uvicorn.run(
+        "app.main:app", host="0.0.0.0", port=2700, log_level="debug", reload=True
+    )
