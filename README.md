@@ -7,7 +7,9 @@ OpenAI's [Whisper](https://github.com/openai/whisper/) dockerized and put behind
   * or get a vtt-file
 * load whisper model
   1. via environment variable to docker-container: `docker run -e MODEL_NAME=base ...`
-  2. get-request: `curl localhost:2700/load_model/base`
+  2. get-request: `curl http://localhost:2700/load_model/large`
+     * gives you response like this: `{"loaded_model":"https://openaipublic.azureedge.net/main/whisper/models/<some-hash>/large.pt"}`
+* [docker-image](https://hub.docker.com/repository/docker/dertilo/whisper-fastapi-service/general)
 
 ## TL;DR
 1. run docker-container
