@@ -1,6 +1,15 @@
 # Whisper FastAPI Service [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![bear-ified](https://raw.githubusercontent.com/beartype/beartype-assets/main/badge/bear-ified.svg)](https://beartype.readthedocs.io)
 OpenAI's [Whisper](https://github.com/openai/whisper/) dockerized and put behind [FastAPI](https://fastapi.tiangolo.com/)
-## TL;DR (Too Lazy Doit Rapido!)
+
+## features
+* transcribe/translate via fastapi's [UploadFile](https://fastapi.tiangolo.com/tutorial/request-files/#uploadfile) [form-data](https://fastapi.tiangolo.com/tutorial/request-files/#what-is-form-data)
+  * as response get a json 
+  * or get a vtt-file
+* load whisper model
+  1. via environment variable to docker-container: `docker run -e MODEL_NAME=base ...`
+  2. get-request: `curl localhost:2700/load_model/base`
+
+## TL;DR
 1. run docker-container
 ```commandline
 docker run --rm -p 2700:2700 dertilo/whisper-fastapi-service:latest
@@ -46,3 +55,7 @@ docker build -t whisper-fastapi-service .
 
 docker run --rm -p 2700:2700 whisper-fastapi-service
 ```
+
+# TODO
+* use ONNX-models via OpenVino, [see](https://github.com/openai/whisper/discussions/208)
+* GPU-docker-image

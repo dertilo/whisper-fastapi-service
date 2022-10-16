@@ -1,5 +1,6 @@
 misc_utils@git+https://github.com/dertilo/misc-utils@main#egg=misc_utils
 beartype==0.11.0
+torch@https://download.pytorch.org/whl/cpu/torch-1.12.0%2Bcpu-cp39-cp39-linux_x86_64.whl
 whisper@git+https://github.com/openai/whisper.git@d18e9ea5dd2ca57c697e8e55f9e654f06ede25d0#egg=whisper
 
 # fastapi deps

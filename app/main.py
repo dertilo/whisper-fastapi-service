@@ -51,7 +51,7 @@ async def vtt_file(
     # inspired by: https://cloudbytes.dev/snippets/received-return-a-file-from-in-memory-buffer-using-fastapi
 
     vtt_file = StringIO()
-    write_vtt(result["segments"], file = vtt_file)
+    write_vtt(result["segments"], file=vtt_file)
     vtt_file.seek(0)
     return StreamingResponse(
         vtt_file,
